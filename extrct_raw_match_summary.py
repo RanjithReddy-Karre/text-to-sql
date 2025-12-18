@@ -11,7 +11,7 @@ print(f"Process started at : {start_time}")
 
 # base_url = "https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/archievefeeds"
 year = ''
-destination_path = Path("D:\\git\\text-to-sql\\data\\input")
+destination_path = Path("D:\\git\\text-to-sql\\data\\output\\raw")
 ipl_competition_links_df = pd.read_csv("D:\\git\\text-to-sql\\data\\input\\IPL_COMPETETION_LINKS.csv")
 competition_list = ipl_competition_links_df["link"].tolist()
 

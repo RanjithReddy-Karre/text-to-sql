@@ -6,8 +6,8 @@ from datetime import datetime
 start_time = datetime.now()
 print(f"Process started at : {start_time}")
 
-input_path = Path("D:\\git\\text-to-sql\\data\\input")
-output_path = Path("D:\\git\\text-to-sql\\data\\output")
+input_path = Path("D:\\git\\text-to-sql\\data\\output\\raw")
+output_path = Path("D:\\git\\text-to-sql\\data\\output\\processed")
 
 def extract_match_summary(match_json: dict) -> dict:
     """
