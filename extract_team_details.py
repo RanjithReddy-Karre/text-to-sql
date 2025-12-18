@@ -5,10 +5,10 @@ from datetime import datetime
 start_time = datetime.now()
 print(f"Process started at : {start_time}")
 
-input_path  = Path(f"D:\\git\\text-to-sql\\data\\input")
+input_path  = Path(f"D:\\git\\text-to-sql\\data\\output\\processed\\match_summary")
 output_path  = Path(f"D:\\git\\text-to-sql\\data\\output")
 
-match_summary_archive_df = pd.read_csv(f"{output_path}\\match_summary_archive_list.csv")
+match_summary_archive_df = pd.read_csv(f"{input_path}\\match_summary_archive_list.csv")
 
 match_summary_archive_df = match_summary_archive_df[['home_team_id','home_team_name','home_team_logo']]
 match_summary_archive_df = match_summary_archive_df.drop_duplicates(subset = ['home_team_id','home_team_name'], keep= 'last').dropna(subset = 'home_team_logo').sort_values(by='home_team_id')
