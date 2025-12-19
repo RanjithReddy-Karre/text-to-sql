@@ -6,7 +6,7 @@ from datetime import datetime
 start_time = datetime.now()
 print(f"Process started at : {start_time}")
 
-input_path = Path("D:\\git\\text-to-sql\\data\\output\\raw")
+input_path = Path("D:\\git\\text-to-sql\\data\\output\\raw\\match_summary")
 output_path = Path("D:\\git\\text-to-sql\\data\\output\\processed")
 
 def extract_match_summary(match_json: dict) -> dict:
@@ -75,7 +75,7 @@ for file in input_path.glob("*.json"):
         match_summery_data.append(extract_match_summary(match_summery_json))
         match_summary_archive_list.append(extract_match_summary(match_summery_json))
     
-    output_file  = output_path / f"{str(file).split("\\")[-1].replace('.json', '.csv')}"
+    output_file  = output_path / "match_summary" / f"{str(file).split("\\")[-1].replace('.json', '.csv')}"
     match_summery_df = pd.DataFrame (match_summery_data)
     match_summery_df.to_csv(output_file, index=False)
     print(f"✅ Saved {output_file} .")
