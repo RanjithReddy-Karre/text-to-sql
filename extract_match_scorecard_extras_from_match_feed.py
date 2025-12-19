@@ -60,8 +60,6 @@ def extract_batting(d, cid):
         "player_id": get_player_id(d),
         "player_name": safe_str(d.get("PlayerName")),
         "playing_order": safe_int(d.get("PlayingOrder")),
-        "bowler_name": safe_str(d.get("BowlerName")),
-        "out_description": safe_str(d.get("OutDesc")),
         "runs": safe_int(d.get("Runs")),
         "balls": safe_int(d.get("Balls")),
         "fours": safe_int(d.get("Fours")),
@@ -99,6 +97,7 @@ def extract_extras(d, cid):
         "leg_byes": safe_int(d.get("LegByes")),
         "no_balls": safe_int(d.get("NoBalls")),
         "wides": safe_int(d.get("Wides")),
+        "current_run_rate": safe_float(d.get("CurrentRunRate")),
     }
 
 
@@ -115,20 +114,68 @@ def extract_fow(d, cid):
         "fall_overs": safe_float(d.get("FallOvers")),
     }
 
+
+def extract_over_history_ball(d, cid):
+    return {
+        "competition_id": cid,
+        "match_id": safe_int(d.get("MatchID")),
+        "innings_no": safe_int(d.get("InningsNo")),
+        "over_no": safe_int(d.get("OverNo")),
+        "ball_no": safe_int(d.get("BallNo")),
+        "ball_id": safe_str(d.get("BallID")),
+        "ball_unique_id": safe_int(d.get("BallUniqueID")),
+
+        "batting_team_id": safe_int(d.get("BattingTeamID")),
+        "striker_id": safe_str(d.get("StrikerID")),
+        "non_striker_id": safe_str(d.get("NonStrikerID")),
+        "bowler_id": safe_str(d.get("BowlerID")),
+
+        # 🔑 IMPORTANT CHANGE (as requested)
+        "runs_off_bat": safe_int(d.get("ActualRuns")),
+
+        "extras": safe_int(d.get("Extras")),
+        "total_runs": safe_int(d.get("TotalRuns")),
+        "total_wickets": safe_int(d.get("TotalWickets")),
+        "is_dot_ball": safe_int(d.get("IsDotball")),
+        "is_four": safe_int(d.get("IsFour")),
+        "is_six": safe_int(d.get("IsSix")),
+        "is_wicket": safe_int(d.get("IsWicket")),
+        "wicket_type": safe_str(d.get("WicketType")),
+
+        "is_wide": safe_int(d.get("IsWide")),
+        "is_no_ball": safe_int(d.get("IsNoBall")),
+        "is_bye": safe_int(d.get("IsBye")),
+        "is_leg_bye": safe_int(d.get("IsLegBye")),
+
+        "bowling_line": safe_str(d.get("BOWLING_LINE_ID")),
+        "bowling_length": safe_str(d.get("BOWLING_LENGTH_ID")),
+        "bowl_type": safe_str(d.get("BowlTypeName")),
+        "shot_type": safe_str(d.get("ShotType")),
+        "is_bouncer": safe_int(d.get("IsBouncer")),
+        "is_free_hit": safe_int(d.get("IsFreeHit")),
+    }
+
 # =========================
 # Validation
 # =========================
 def valid(row):
-    return row["match_id"] > 0
+    return row.get("match_id", 0) > 0
+
+def is_valid_over_history_ball(row: dict) -> bool:
+    return (
+        row.get("match_id", 0) > 0
+        and 1 <= row.get("ball_no", 0) <= 6
+    )
 
 # =========================
-# Output dirs
+# Output directories
 # =========================
 dirs = {
     "batting": OUTPUT_PATH_PROCESSED / "batting_scorecard",
     "bowling": OUTPUT_PATH_PROCESSED / "bowling_scorecard",
     "extras": OUTPUT_PATH_PROCESSED / "extras_scorecard",
     "fow": OUTPUT_PATH_PROCESSED / "fall_of_wickets",
+    "over_history": OUTPUT_PATH_PROCESSED / "over_history",
 }
 
 for d in dirs.values():
@@ -155,29 +202,36 @@ for file in MATCH_FEED_PATH.glob("*.json"):
         if not inn:
             continue
 
-        for b in inn.get("BattingCard", []):
-            row = extract_batting(b, competition_id)
+        for r in inn.get("BattingCard", []):
+            row = extract_batting(r, competition_id)
             if valid(row):
                 per_match["batting"].append(row)
                 all_data["batting"].append(row)
 
-        for b in inn.get("BowlingCard", []):
-            row = extract_bowling(b, competition_id)
+        for r in inn.get("BowlingCard", []):
+            row = extract_bowling(r, competition_id)
             if valid(row):
                 per_match["bowling"].append(row)
                 all_data["bowling"].append(row)
 
-        for e in inn.get("Extras", []):
-            row = extract_extras(e, competition_id)
+        for r in inn.get("Extras", []):
+            row = extract_extras(r, competition_id)
             if valid(row):
                 per_match["extras"].append(row)
                 all_data["extras"].append(row)
 
-        for fow in inn.get("FallOfWickets", []):
-            row = extract_fow(fow, competition_id)
+        for r in inn.get("FallOfWickets", []):
+            row = extract_fow(r, competition_id)
             if valid(row):
                 per_match["fow"].append(row)
                 all_data["fow"].append(row)
+
+        for r in inn.get("OverHistory", []):
+            row = extract_over_history_ball(r, competition_id)
+            if not is_valid_over_history_ball(row):
+                continue
+            per_match["over_history"].append(row)
+            all_data["over_history"].append(row)
 
     if not any(per_match.values()):
         continue
