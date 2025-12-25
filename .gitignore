@@ -1,3 +1,5 @@
 venv/
 data/
 config/
+.streamlit/secrets.toml
+

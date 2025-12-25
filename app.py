@@ -4,12 +4,12 @@ from pathlib import Path
 import pandas as pd
 import snowflake.connector
 
-from config import operrouter, snowflake_connection
 
 # ---------------- CONFIG ----------------
 MODEL = "kwaipilot/kat-coder-pro:free"
 BASE_URL = "https://openrouter.ai/api/v1"
-API_KEY = operrouter.API_KEY
+API_KEY = st.secrets["OPENROUTER_API_KEY"]
+
 # ----------------------------------------
 
 def read_file(path):
@@ -29,13 +29,13 @@ def build_prompt(question: str) -> str:
 
 def snowflake_sql_to_df(sql: str) -> pd.DataFrame:
     conn = snowflake.connector.connect(
-        user=snowflake_connection.user,
-        password=snowflake_connection.password,
-        account=snowflake_connection.account,
-        warehouse=snowflake_connection.warehouse,
-        database=snowflake_connection.database,
-        schema=snowflake_connection.schema,
-        role=snowflake_connection.role
+        user=st.secrets["SNOWFLAKE_USER"],
+        password=st.secrets["SNOWFLAKE_PASSWORD"],
+        account=st.secrets["SNOWFLAKE_ACCOUNT"],
+        warehouse=st.secrets["SNOWFLAKE_WAREHOUSE"],
+        database=st.secrets["SNOWFLAKE_DATABASE"],
+        schema=st.secrets["SNOWFLAKE_SCHEMA"],
+        role=st.secrets["SNOWFLAKE_ROLE"]
     )
 
     try:
