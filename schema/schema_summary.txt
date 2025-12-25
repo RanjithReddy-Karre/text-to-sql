@@ -1,0 +1,205 @@
+You are working with precomputed IPL analytics tables.
+All business logic is already finalized.
+You must NOT derive, infer, or reinterpret match logic.
+Use only the columns and meanings described below.
+
+==================================================
+TABLE: ipl_data.analytics.matches_analytics    (fully qualified name)
+==================================================
+
+Purpose:
+This table contains one row per IPL match.
+It represents FINAL match-level truth such as season, venue, toss,
+and match result. All complex cricket logic is already resolved.
+
+Use this table when the question is about:
+- Matches, seasons, venues, cities
+- Toss impact
+- Match outcomes
+- League vs playoff analysis
+- Win margins
+- Counts and percentages of matches
+
+--------------------------------------------------
+COLUMN DEFINITIONS
+--------------------------------------------------
+
+match_id  
+- Unique identifier for a match  
+- Use this to join with other analytics tables  
+
+season  
+- IPL season year (example: 2016, 2020)  
+- Use this for season-wise grouping and trends  
+
+match_date  
+- Calendar date when the match was played  
+- Use this for timelines and season duration analysis  
+
+city  
+- City where the match was played  
+- Use this for location-based analysis  
+
+venue_name  
+- Stadium name where the match was played  
+- Use this for venue-level comparisons  
+
+home_team_name  
+- Home team for the match  
+
+away_team_name  
+- Away team for the match  
+
+toss_winner_team  
+- Team that won the toss  
+- Use this to analyze toss advantage  
+
+first_batting_team  
+- Team that batted first  
+- Use this to compare batting-first vs chasing outcomes  
+
+second_batting_team  
+- Team that batted second  
+
+match_result_type  
+- Final result classification of the match  
+- Possible values:
+  - NORMAL → match completed normally
+  - SUPER_OVER → match decided by super over
+  - NO_RESULT → no valid result
+  - ABANDONED → match abandoned
+- Use this to filter valid matches  
+
+winner_team  
+- Team that won the match  
+- NULL if match had no result or was abandoned  
+- Use this to determine match winners  
+
+is_completed_match  
+- TRUE → match has a valid winner
+- FALSE → no result or abandoned
+- ALWAYS use this when calculating percentages  
+
+win_margin_type  
+- How the match was won
+- Possible values:
+  - RUNS → defending team won by runs
+  - WICKETS → chasing team won by wickets  
+
+win_margin_value  
+- Numeric margin of victory
+- Runs if win_margin_type = RUNS
+- Wickets if win_margin_type = WICKETS  
+
+match_type  
+- Stage of the tournament
+- Possible values:
+  - League
+  - Qualifier 1
+  - Eliminator
+  - Qualifier 2
+  - Final
+- Use this to separate league vs playoff matches  
+
+--------------------------------------------------
+IMPORTANT RULES FOR THIS TABLE
+--------------------------------------------------
+- Do NOT parse or interpret free text
+- Do NOT assume all matches have results
+- Use is_completed_match = TRUE for win analysis
+- Use match_result_type to include/exclude super over matches
+
+==================================================
+TABLE: ipl_data.analytics.team_innings_stats_analytics    (fully qualified name)
+==================================================
+
+Purpose:
+This table contains one row per team per match per innings.
+It represents FINAL innings-level facts such as runs, wickets,
+overs, and chase outcomes.
+
+Use this table when the question is about:
+- Team scores
+- First innings averages
+- Chasing vs defending
+- Highest successful chases
+- Venue scoring patterns
+- Innings-based comparisons
+
+--------------------------------------------------
+COLUMN DEFINITIONS
+--------------------------------------------------
+
+match_id  
+- Match identifier
+- Use this to join with matches_analytics  
+
+season  
+- IPL season year  
+
+match_type  
+- Match stage (League, Final, etc.)
+- Same meaning as matches_analytics  
+
+city  
+- City where the match was played  
+
+venue_name  
+- Stadium where the match was played  
+
+innings_no  
+- Innings number
+- 1 → first innings
+- 2 → second innings  
+
+team_id  
+- Internal identifier for the team  
+
+team_name  
+- Name of the team batting in this innings  
+
+runs  
+- Total runs scored by the team in this innings
+- Includes extras
+- Final and validated value  
+
+total_wickets  
+- Total wickets lost in this innings  
+
+overs_faced  
+- Total overs bowled in this innings
+- Sourced from innings summary
+- Available for ALL matches  
+
+is_chasing  
+- TRUE → team is batting second
+- FALSE → team is batting first  
+
+target_runs  
+- Target required to win
+- Only populated for second innings
+- NULL for first innings  
+
+chase_success  
+- TRUE → chasing team successfully won the match
+- FALSE → chasing team lost
+- NULL for first innings  
+
+--------------------------------------------------
+IMPORTANT RULES FOR THIS TABLE
+--------------------------------------------------
+- Do NOT calculate targets or winners
+- Do NOT infer pressure or run rates
+- Use chase_success directly for chase analysis
+- Innings data is already validated and finalized
+
+==================================================
+GENERAL RULES (MANDATORY)
+==================================================
+
+- Use ONLY the tables and columns described above
+- Do NOT invent new columns or tables
+- Do NOT infer business logic
+- Treat NULL values as missing data
+- Return ONLY valid Snowflake SQL
+- Do NOT explain SQL unless explicitly asked

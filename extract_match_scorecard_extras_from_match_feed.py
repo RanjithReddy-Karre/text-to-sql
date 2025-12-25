@@ -97,7 +97,7 @@ def extract_extras(d, cid):
         "leg_byes": safe_int(d.get("LegByes")),
         "no_balls": safe_int(d.get("NoBalls")),
         "wides": safe_int(d.get("Wides")),
-        "current_run_rate": safe_float(d.get("CurrentRunRate")),
+        "penalty": safe_int(d.get("Penalty")),
     }
 
 
@@ -263,3 +263,6 @@ for k, rows in all_data.items():
 end_time = datetime.now()
 print(f"Process ended at : {end_time}")
 print(f"Total process time (sec): {(end_time - start_time).total_seconds()}")
+
+
+

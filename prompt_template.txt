@@ -1,0 +1,7 @@
+{{RULES}}
+
+Schema:
+{{SCHEMA_SUMMARY}}
+
+Question:
+{{QUESTION}}
